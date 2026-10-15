@@ -1,9 +1,7 @@
-function baseUrl() {
-  const value = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
+const DEFAULT_API_BASE_URL = "https://admin.tech247.com.bd/api";
 
-  if (!value) {
-    throw new Error("API_BASE_URL is not set");
-  }
+export function baseUrl() {
+  const value = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_API_BASE_URL;
 
   return value.replace(/\/$/, "");
 }

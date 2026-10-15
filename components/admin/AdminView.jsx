@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/components/store/StoreProvider";
 import Price from "@/components/ui/Price";
+import { baseUrl } from "@/config/api";
 import { adminSummary } from "@/service/orders";
 
-const staffAdminUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/api\/?$/, "/admin");
+const staffAdminUrl = baseUrl().replace(/\/api\/?$/, "/admin");
 
 export default function AdminView() {
   const store = useStore();

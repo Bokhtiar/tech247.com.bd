@@ -1,4 +1,10 @@
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || "https://admin.tech247.com.bd/api";
+
 const nextConfig = {
+  env: {
+    API_BASE_URL: apiBaseUrl,
+    NEXT_PUBLIC_API_BASE_URL: apiBaseUrl,
+  },
   images: {
     dangerouslyAllowLocalIP: true,
     remotePatterns: [
