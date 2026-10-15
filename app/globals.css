@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/*
+  Brand and surface colors live here so the whole store follows one palette.
+  Dark mode swaps the surface tokens; components never hardcode page colors.
+*/
+:root {
+  --brand: #e02424;
+  --brand-hover: #c81e1e;
+  --brand-light: #f87171;
+  --brand-deep: #b91c1c;
+  --nav: #0e1626;
+  --ink: #1e293b;
+  --ink-strong: #0f172a;
+  --ink-muted: #64748b;
+  --surface: #ffffff;
+  --muted: #f8fafc;
+  --line: #e2e8f0;
+  --chip: #f1f5f9;
+  --hero: #0f172a;
+}
+
+html.dark {
+  --ink: #f8fafc;
+  --ink-strong: #f8fafc;
+  --ink-muted: #94a3b8;
+  --surface: #111827;
+  --muted: #0b0f19;
+  --line: #1e293b;
+  --chip: #0f172a;
+  --hero: #020617;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-light: var(--brand-light);
+  --color-brand-deep: var(--brand-deep);
+  --color-nav: var(--nav);
+  --color-ink: var(--ink);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-muted: var(--ink-muted);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-chip: var(--chip);
+  --color-hero: var(--hero);
+  --font-sans: var(--font-inter), Inter, system-ui, sans-serif;
+  --font-brand: var(--font-rajdhani), Rajdhani, sans-serif;
+}
+
+body {
+  background: var(--muted);
+  color: var(--ink);
+}
+
+.badge-bdt::before {
+  content: "৳ ";
+  font-weight: 500;
+}
+
+.liquid-glass-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.liquid-glass-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.15) 100%);
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1.5px);
+}
+
+.liquid-glass-red {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-deep) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--brand) 38%, transparent), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+  transition: all 0.25s ease;
+}
+
+.liquid-glass-red:hover {
+  background: linear-gradient(135deg, var(--brand-light) 0%, var(--brand) 100%);
+  transform: translateY(-1.5px);
+}
+
+.product-img-zoom {
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.group:hover .product-img-zoom {
+  transform: scale(1.09);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #printArea,
+  #printArea * {
+    visibility: visible;
+  }
+
+  #printArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    display: block !important;
+  }
+}
