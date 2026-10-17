@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { formatBDT } from "@/lib/format";
 import { useStore } from "@/components/store/StoreProvider";
@@ -10,7 +10,6 @@ import RemoteImage from "@/components/ui/RemoteImage";
 
 export default function Header() {
   const router = useRouter();
-  const pathname = usePathname();
   const store = useStore();
   const [query, setQuery] = useState(store.filters.searchQuery);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
@@ -45,8 +44,6 @@ export default function Header() {
     setQuery(next);
     store.search(next);
   };
-
-  const staffLabel = pathname.startsWith("/admin") ? "Customer Mode" : "Staff Portal";
 
   return (
     <>
@@ -101,13 +98,12 @@ export default function Header() {
               <span className="hidden sm:inline">{store.dark ? "Light" : "Dark"}</span>
             </button>
             <span className="text-slate-700">|</span>
-            <button
-              type="button"
-              onClick={() => router.push(pathname.startsWith("/admin") ? "/" : "/admin")}
+            <a
+              href="http://admin.tech247.com.bd/admin/login"
               className="flex items-center gap-1 rounded bg-brand px-2.5 py-0.5 font-bold text-white shadow-sm transition hover:bg-brand-hover"
             >
-              <i className="fa-solid fa-user-shield" /> <span>{staffLabel}</span>
-            </button>
+              <i className="fa-solid fa-user-shield" /> <span>Staff Portal</span>
+            </a>
           </div>
         </div>
       </div>
