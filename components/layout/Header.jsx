@@ -50,12 +50,12 @@ export default function Header() {
 
   return (
     <>
-      <div className="border-b border-slate-800 bg-slate-900 px-2 py-1.5 text-xs text-slate-300 sm:px-4">
+      <div className="hidden border-b border-slate-800 bg-slate-900 px-2 py-1.5 text-xs text-slate-300 lg:block lg:px-4">
         <div className="mx-auto flex w-full max-w-[1720px] items-center justify-between">
           <div className="flex items-center space-x-3 sm:space-x-6">
-            <span className="flex items-center gap-1.5 font-semibold text-white">
+            <span className="flex items-center gap-1.5 whitespace-nowrap font-semibold text-white">
               <i className="fa-solid fa-phone text-brand" /> Hotline:{" "}
-              <span className="font-extrabold tracking-wide">16724</span> / 09678-TECH24
+              <span className="font-extrabold tracking-wide">16724</span>
             </span>
             <span className="hidden items-center gap-1.5 font-medium md:flex">
               <i className="fa-solid fa-clock text-amber-400" /> 10:00 AM - 8:00 PM (Everyday)
@@ -64,7 +64,7 @@ export default function Header() {
               <i className="fa-solid fa-shield-check text-emerald-400" /> Official Distributor Warranty
             </span>
           </div>
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="hidden items-center space-x-2 sm:flex sm:space-x-3">
             <button
               type="button"
               onClick={() => store.openUi("warranty")}
@@ -124,7 +124,7 @@ export default function Header() {
               <i className="fa-solid fa-bars text-xl" />
             </button>
             <Logo />
-            <div ref={searchRef} className="relative mx-1 max-w-2xl flex-1 sm:mx-2">
+            <div ref={searchRef} className="relative mx-1 min-w-16 max-w-2xl flex-1 sm:mx-2">
               <div className="relative flex items-center">
                 <input
                   value={query}
@@ -136,7 +136,7 @@ export default function Header() {
                     if (event.key === "Enter") submitSearch();
                   }}
                   placeholder="Search components, laptops, desktops, cameras, security, networking..."
-                  className="w-full rounded-full border border-line bg-chip py-2 pr-12 pl-4 text-xs text-ink shadow-inner outline-none transition focus:border-brand focus:bg-surface focus:ring-2 focus:ring-brand/20 sm:text-sm"
+                  className="w-full min-w-0 rounded-full border border-line bg-chip py-2 pr-10 pl-3 text-xs text-ink shadow-inner outline-none transition focus:border-brand focus:bg-surface focus:ring-2 focus:ring-brand/20 sm:pr-12 sm:pl-4 sm:text-sm"
                 />
                 <button
                   type="button"
@@ -179,8 +179,8 @@ export default function Header() {
                 </div>
               ) : null}
             </div>
-            <div className="flex shrink-0 items-center space-x-1.5 sm:space-x-3">
-              <Link href="/pc-builder" className="liquid-glass-red flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-white shadow-md sm:px-4">
+            <div className="flex shrink-0 items-center gap-0.5 sm:gap-3">
+              <Link href="/pc-builder" className="liquid-glass-red flex items-center gap-1.5 rounded-xl px-2 py-2 text-xs font-bold text-white shadow-md sm:px-4">
                 <i className="fa-solid fa-microchip animate-pulse text-yellow-300" />
                 <span className="hidden sm:inline">PC BUILDER</span>
               </Link>
@@ -189,7 +189,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => store.toggleUi("cart")}
-                className="relative flex items-center gap-2 rounded-xl border border-line bg-chip px-2.5 py-1.5 text-ink transition hover:bg-red-50 hover:text-brand"
+                className="relative flex items-center gap-2 rounded-xl border border-line bg-chip px-2 py-1.5 text-ink transition hover:bg-red-50 hover:text-brand sm:px-2.5"
               >
                 <span className="relative">
                   <i className="fa-solid fa-cart-shopping text-sm sm:text-base" />
@@ -208,13 +208,15 @@ export default function Header() {
                   onClick={() => setAccountOpen((open) => !open)}
                   className="flex items-center gap-1.5 rounded-xl p-1 text-ink transition hover:bg-chip sm:px-2 sm:py-1"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-chip text-xs font-bold sm:h-8 sm:w-8">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-chip text-xs font-bold sm:h-8 sm:w-8">
                     <i className="fa-regular fa-user" />
                   </span>
                   <span className="hidden text-xs font-semibold md:block">
                     {store.user.isLoggedIn ? store.user.name.split(" ")[0] : "Account"}
                   </span>
-                  <i className="fa-solid fa-chevron-down text-[9px] text-ink-muted" />
+                  <span className="hidden sm:inline">
+                    <i className="fa-solid fa-chevron-down text-[9px] text-ink-muted" />
+                  </span>
                 </button>
                 {accountOpen ? (
                   <div className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-line bg-surface py-2 text-sm shadow-xl">
@@ -485,8 +487,8 @@ function CategoryTree({ nodes, depth, onPick }) {
 
 function IconButton({ label, onClick, icon, count, hot = false }) {
   return (
-    <button type="button" onClick={onClick} title={label} className="relative rounded-full p-2 text-ink transition hover:bg-chip hover:text-brand">
-      <i className={`${icon} text-base sm:text-lg`} />
+    <button type="button" onClick={onClick} title={label} className="relative rounded-full p-1 text-ink transition hover:bg-chip hover:text-brand sm:p-2">
+      <i className={`${icon} text-sm sm:text-lg`} />
       {count > 0 ? (
         <span className={`absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white ${hot ? "bg-brand" : "bg-slate-800"}`}>
           {count}

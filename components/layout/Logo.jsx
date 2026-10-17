@@ -7,17 +7,17 @@ export default function Logo({ onDark = false, compact = false }) {
   return (
     <Link href="/" className="flex items-center gap-2 select-none shrink-0">
       <span className={`flex items-center font-black tracking-tighter leading-none font-brand ${ink}`}>
-        <span className="text-3xl sm:text-4xl">T</span>
+        <span className="text-2xl sm:text-4xl">T</span>
         <span className="relative mx-0.5 inline-flex h-7 w-4 flex-col justify-between sm:h-8">
           <span className={`h-1.5 w-full rounded-sm sm:h-2 ${bar}`} />
           <span className="h-1 w-full rounded-sm bg-brand sm:h-1.5" />
           <span className="h-1.5 w-full rounded-sm bg-brand sm:h-2" />
         </span>
-        <span className="text-3xl sm:text-4xl">CH</span>
-        <span className="ml-1 text-3xl italic text-brand sm:text-4xl">2</span>
-        <span className="relative text-3xl sm:text-4xl">
+        <span className="text-2xl sm:text-4xl">CH</span>
+        <span className="ml-0.5 text-2xl italic text-brand sm:ml-1 sm:text-4xl">2</span>
+        <span className="relative text-2xl sm:text-4xl">
           4
-          <i className="fa-solid fa-bolt absolute -top-1 -right-2 text-xs text-brand" />
+          <i className="fa-solid fa-bolt absolute -top-1 -right-1.5 text-[10px] text-brand sm:text-xs" />
         </span>
       </span>
       {compact ? null : (

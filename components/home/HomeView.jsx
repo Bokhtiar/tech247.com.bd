@@ -95,7 +95,7 @@ export default function HomeView({ featuredCategories = [] }) {
                 type="button"
                 key={category.id}
                 onClick={() => store.browseCategory(category.slug)}
-                className="flex flex-col items-center gap-1 rounded-xl border border-line bg-surface p-2 text-center shadow-sm transition hover:border-brand sm:gap-1.5 sm:p-3.5"
+                className="flex flex-col items-center gap-1 rounded-xl border border-red-200 bg-red-50/70 p-2 text-center shadow-sm transition hover:border-brand sm:gap-1.5 sm:p-3.5"
               >
                 <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-chip text-ink sm:h-10 sm:w-10">
                   {category.icon_url ? <RemoteImage src={category.icon_url} alt="" sizes="40px" className="object-contain p-1.5 sm:p-2" /> : <i className={`fa-solid ${categoryIcon(category.slug)} text-xs sm:text-sm`} />}
