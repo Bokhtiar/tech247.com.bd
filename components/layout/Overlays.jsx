@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { stores } from "@/lib/catalog";
 import { loginCustomer, registerCustomer } from "@/service/auth";
 import { useStore } from "@/components/store/StoreProvider";
@@ -178,50 +178,139 @@ function CartDrawer() {
 
 function CompareModal() {
   const store = useStore();
-  const items = store.products.filter((product) => store.compareList.includes(product.id));
+  const [groupProducts, setGroupProducts] = useState([]);
+  const [groupName, setGroupName] = useState("");
+  const [status, setStatus] = useState("idle");
+
+  const groupId = useMemo(() => {
+    for (const id of store.compareList) {
+      const product = store.productById(id);
+      if (product?.compare_group_id) return product.compare_group_id;
+    }
+    return null;
+  }, [store.compareList, store.productById]);
+
+  useEffect(() => {
+    if (!store.ui.compare) return undefined;
+    if (!groupId) {
+      setGroupProducts([]);
+      setGroupName("");
+      setStatus("empty");
+      return undefined;
+    }
+
+    let cancelled = false;
+    setStatus("loading");
+    fetch(`/api/compare?group_id=${groupId}`, { cache: "no-store" })
+      .then(async (response) => {
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.message || "Could not load compare group.");
+        return body;
+      })
+      .then((body) => {
+        if (cancelled) return;
+        setGroupProducts(Array.isArray(body.data) ? body.data : []);
+        setGroupName(body.meta?.compare_group_name || "");
+        setStatus("ready");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setGroupProducts([]);
+        setStatus("error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [groupId, store.ui.compare]);
+
   if (!store.ui.compare) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-sm">
-      <div className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-surface shadow-2xl">
-        <div className="flex items-center justify-between bg-slate-800 p-4 text-white">
-          <h2 className="flex items-center gap-2 font-bold"><i className="fa-solid fa-code-compare text-brand" /> Compare Technical Specifications</h2>
-          <div className="flex items-center gap-3">
-            <button type="button" onClick={() => store.setCompareList([])} className="text-xs text-slate-300 underline">Clear All</button>
-            <button type="button" onClick={() => store.closeUi("compare")} aria-label="Close"><i className="fa-solid fa-xmark text-lg" /></button>
+      <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-surface shadow-2xl">
+        <div className="flex items-center justify-between gap-3 bg-slate-800 px-4 py-3 text-white sm:px-5">
+          <div>
+            <h2 className="flex items-center gap-2 text-sm font-bold sm:text-base">
+              <i className="fa-solid fa-code-compare text-brand" />
+              Compare group
+            </h2>
+            <p className="mt-0.5 text-[11px] text-slate-300">
+              {groupName || "Products"} · selected {store.compareList.length}/4
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {store.compareList.length > 0 ? (
+              <button type="button" onClick={() => store.clearCompare()} className="text-[11px] text-slate-300 underline">
+                Clear
+              </button>
+            ) : null}
+            <button type="button" onClick={() => store.closeUi("compare")} aria-label="Close" className="rounded-lg p-1.5 hover:bg-white/10">
+              <i className="fa-solid fa-xmark text-lg" />
+            </button>
           </div>
         </div>
-        <div className="flex-1 overflow-x-auto p-4 sm:p-6">
-          {items.length === 0 ? (
-            <p className="py-16 text-center text-xs text-ink-muted">No hardware selected for comparison.</p>
-          ) : (
-            <table className="w-full border border-line text-left text-xs">
-              <thead>
-                <tr className="bg-chip">
-                  <th className="w-40 p-3 text-[10px] font-semibold text-ink-muted uppercase">Specifications</th>
-                  {items.map((product) => (
-                    <th key={product.id} className="min-w-[200px] p-3 text-ink">
-                      <Price value={product.price} className="mb-1 block font-extrabold text-brand" />
-                      <span className="relative mx-auto mb-2 block h-16 w-16 overflow-hidden rounded-lg border border-line">
-                        <RemoteImage src={product.image} alt="" sizes="64px" className="object-contain" />
-                      </span>
-                      <p className="line-clamp-2 text-xs font-semibold">{product.name}</p>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {["Brand", "Category", "Warranty"].map((label) => (
-                  <tr key={label} className="border-t border-line">
-                    <td className="p-3 font-bold text-ink">{label}</td>
-                    {items.map((product) => (
-                      <td key={product.id} className="p-3">{label === "Brand" ? product.brand : label === "Category" ? product.category : product.warranty}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+          {status === "loading" ? (
+            <p className="py-16 text-center text-xs text-ink-muted">Loading group products...</p>
+          ) : null}
+          {status === "empty" ? (
+            <p className="py-16 text-center text-xs text-ink-muted">
+              Add a product to compare first. Products from the same compare group will appear here.
+            </p>
+          ) : null}
+          {status === "error" ? (
+            <p className="py-16 text-center text-xs font-semibold text-rose-500">Could not load compare group products.</p>
+          ) : null}
+          {status === "ready" && groupProducts.length === 0 ? (
+            <p className="py-16 text-center text-xs text-ink-muted">No products in this compare group.</p>
+          ) : null}
+          {status === "ready" && groupProducts.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {groupProducts.map((product) => {
+                const selected = store.compareList.includes(product.id);
+                return (
+                  <button
+                    key={product.id}
+                    type="button"
+                    onClick={() => store.toggleCompare(product.id)}
+                    className={`rounded-2xl border p-3 text-left transition ${
+                      selected ? "border-brand bg-red-50 ring-1 ring-brand/40" : "border-line bg-chip hover:border-brand/40"
+                    }`}
+                  >
+                    <span className="relative mb-2 block aspect-square overflow-hidden rounded-xl bg-white">
+                      <RemoteImage src={product.image} alt={product.name} className="object-contain p-2" sizes="160px" />
+                      {selected ? (
+                        <span className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-brand text-[10px] text-white">
+                          <i className="fa-solid fa-check" />
+                        </span>
+                      ) : null}
+                    </span>
+                    <p className="line-clamp-2 text-[11px] font-semibold text-ink-strong">{product.name}</p>
+                    <Price value={product.price} className="mt-1 text-xs font-bold text-brand" />
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line bg-chip px-4 py-3 sm:px-5">
+          <p className="text-[11px] text-ink-muted">Select up to 4 products, then compare specs.</p>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => store.closeUi("compare")} className="rounded-xl border border-line px-4 py-2 text-xs font-bold">
+              Close
+            </button>
+            <button
+              type="button"
+              disabled={store.compareList.length < 2}
+              onClick={() => store.goToComparePage()}
+              className="liquid-glass-red rounded-xl px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+            >
+              Compare selected
+            </button>
+          </div>
         </div>
       </div>
     </div>

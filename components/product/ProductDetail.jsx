@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import Tilt from "react-parallax-tilt";
 import { useStore } from "@/components/store/StoreProvider";
 import Price from "@/components/ui/Price";
 import RemoteImage from "@/components/ui/RemoteImage";
@@ -62,9 +63,10 @@ function ProductGallery({ product }) {
   const images = galleryOf(product);
   const [index, setIndex] = useState(0);
   const [zoom, setZoom] = useState(1);
-  const drag = useRef(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const drag = useRef(null);
   const active = images[Math.min(index, Math.max(images.length - 1, 0))] || null;
+  const tilting = zoom <= 1;
 
   useEffect(() => {
     setIndex(0);
@@ -78,21 +80,43 @@ function ProductGallery({ product }) {
     setOffset({ x: 0, y: 0 });
   }
 
-  function changeZoom(next) {
-    const value = Math.min(3, Math.max(1, next));
-    setZoom(value);
-    if (value === 1) setOffset({ x: 0, y: 0 });
+  function bumpZoom(delta) {
+    setZoom((current) => {
+      const value = Math.min(3, Math.max(1, Number((current + delta).toFixed(2))));
+      if (value <= 1) setOffset({ x: 0, y: 0 });
+      return value;
+    });
   }
+
+  const imageFrame = active ? (
+    <div
+      className="relative h-full w-full"
+      style={
+        zoom > 1
+          ? { transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }
+          : undefined
+      }
+    >
+      <RemoteImage
+        src={active.url}
+        alt={active.alt || product.name}
+        className="object-contain drop-shadow-xl"
+        sizes="(max-width: 1024px) 100vw, 40vw"
+        priority
+      />
+    </div>
+  ) : null;
 
   return (
     <div>
       <div
-        className={`relative h-80 overflow-hidden rounded-2xl border border-line bg-chip sm:h-96 ${zoom > 1 ? "cursor-grab" : ""}`}
+        className={`relative h-80 overflow-hidden rounded-2xl border border-line bg-chip sm:h-96 ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : ""}`}
         onWheel={(event) => {
           event.preventDefault();
-          changeZoom(zoom + (event.deltaY < 0 ? 0.25 : -0.25));
+          bumpZoom(event.deltaY < 0 ? 0.25 : -0.25);
         }}
         onPointerDown={(event) => {
+          if (event.target.closest("[data-zoom-control]")) return;
           if (zoom <= 1) return;
           event.currentTarget.setPointerCapture(event.pointerId);
           drag.current = { x: event.clientX, y: event.clientY, origin: offset };
@@ -107,15 +131,61 @@ function ProductGallery({ product }) {
         onPointerUp={() => {
           drag.current = null;
         }}
+        onPointerLeave={() => {
+          drag.current = null;
+        }}
       >
         {active ? (
-          <div className="absolute inset-0" style={{ transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }}>
-            <RemoteImage src={active.url} alt={active.alt || product.name} className="object-contain" sizes="(max-width: 1024px) 100vw, 40vw" priority />
-          </div>
+          tilting ? (
+            <Tilt
+              className="h-full w-full"
+              tiltMaxAngleX={18}
+              tiltMaxAngleY={22}
+              perspective={1100}
+              transitionSpeed={1200}
+              scale={1.04}
+              glareEnable
+              glareMaxOpacity={0.18}
+              glareColor="#ffffff"
+              glarePosition="all"
+              glareBorderRadius="1rem"
+              tiltReverse={false}
+              gyroscope={false}
+            >
+              <div className="relative h-80 w-full sm:h-96">{imageFrame}</div>
+            </Tilt>
+          ) : (
+            <div className="absolute inset-0">{imageFrame}</div>
+          )
         ) : null}
-        <div className="absolute right-3 bottom-3 flex gap-1">
-          <button type="button" onClick={() => changeZoom(zoom - 0.5)} aria-label="Zoom out" className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface/90 text-sm font-bold shadow">−</button>
-          <button type="button" onClick={() => changeZoom(zoom + 0.5)} aria-label="Zoom in" className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface/90 text-sm font-bold shadow">+</button>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/10 to-transparent" />
+        <div className="absolute right-3 bottom-3 z-10 flex gap-1">
+          <button
+            type="button"
+            data-zoom-control
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              bumpZoom(-0.5);
+            }}
+            aria-label="Zoom out"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface/95 text-sm font-bold shadow ring-1 ring-line"
+          >
+            −
+          </button>
+          <button
+            type="button"
+            data-zoom-control
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              bumpZoom(0.5);
+            }}
+            aria-label="Zoom in"
+            className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface/95 text-sm font-bold shadow ring-1 ring-line"
+          >
+            +
+          </button>
         </div>
       </div>
       {images.length > 1 ? (

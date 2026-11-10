@@ -293,27 +293,85 @@ export function StoreProvider({ categories: initialCategories = [], products: in
     [showToast],
   );
 
+  const comparePath = useCallback((ids = compareRef.current) => {
+    const selected = products.filter((product) => ids.includes(product.id));
+    const groupId = selected.find((product) => product.compare_group_id)?.compare_group_id;
+    const params = new URLSearchParams();
+    if (groupId) params.set("group_id", String(groupId));
+    if (ids.length) params.set("ids", ids.join(","));
+    const query = params.toString();
+    return query ? `/compare?${query}` : "/compare";
+  }, [products]);
+
+  const removeFromCompare = useCallback(
+    (productId) => {
+      const next = compareRef.current.filter((id) => id !== productId);
+      compareRef.current = next;
+      setCompareList(next);
+      showToast("Removed from compare table", "info");
+    },
+    [showToast],
+  );
+
+  const clearCompare = useCallback(() => {
+    compareRef.current = [];
+    setCompareList([]);
+    showToast("Compare list cleared", "info");
+  }, [showToast]);
+
+  const hydrateCompare = useCallback((ids) => {
+    const next = (Array.isArray(ids) ? ids : [])
+      .map((id) => Number(id))
+      .filter(Boolean)
+      .slice(0, 4);
+    compareRef.current = next;
+    setCompareList(next);
+  }, []);
+
   const toggleCompare = useCallback(
     (productId) => {
       const current = compareRef.current;
       if (current.includes(productId)) {
-        const next = current.filter((id) => id !== productId);
-        compareRef.current = next;
-        setCompareList(next);
-        showToast("Removed from compare table", "info");
+        removeFromCompare(productId);
         return;
       }
+
+      const product = products.find((item) => String(item.id) === String(productId));
+      if (!product?.compare_group_id) {
+        showToast("This product is not in a compare group", "warning");
+        return;
+      }
+
       if (current.length >= 4) {
         showToast("You can compare a maximum of 4 products", "warning");
         return;
       }
+
+      if (current.length > 0) {
+        const first = products.find((item) => String(item.id) === String(current[0]));
+        if (!first?.compare_group_id || first.compare_group_id !== product.compare_group_id) {
+          showToast("Only products from the same compare group can be compared", "warning");
+          return;
+        }
+      }
+
       const next = [...current, productId];
       compareRef.current = next;
       setCompareList(next);
       showToast("Added to technical comparison", "success");
+      openUi("compare");
     },
-    [showToast],
+    [openUi, products, removeFromCompare, showToast],
   );
+
+  const openCompare = useCallback(() => {
+    openUi("compare");
+  }, [openUi]);
+
+  const goToComparePage = useCallback(() => {
+    closeUi("compare");
+    router.push(comparePath());
+  }, [closeUi, comparePath, router]);
 
   const applyCoupon = useCallback(
     (code) => {
@@ -457,7 +515,12 @@ export function StoreProvider({ categories: initialCategories = [], products: in
       forgetCart,
       toggleWishlist,
       toggleCompare,
-      setCompareList,
+      removeFromCompare,
+      clearCompare,
+      hydrateCompare,
+      openCompare,
+      goToComparePage,
+      comparePath,
       applyCoupon,
       login,
       logout,
@@ -502,6 +565,12 @@ export function StoreProvider({ categories: initialCategories = [], products: in
       forgetCart,
       toggleWishlist,
       toggleCompare,
+      removeFromCompare,
+      clearCompare,
+      hydrateCompare,
+      openCompare,
+      goToComparePage,
+      comparePath,
       applyCoupon,
       login,
       logout,

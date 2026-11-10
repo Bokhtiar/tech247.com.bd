@@ -12,7 +12,8 @@
     "chart.js": "^4.5.1",
     "next": "16.4.0",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "react-parallax-tilt": "^1.7.351"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",

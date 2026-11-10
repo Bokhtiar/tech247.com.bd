@@ -11,9 +11,16 @@ export default function Footer() {
       <div className="mx-auto max-w-[1720px] px-4 sm:px-6">
         <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-4 lg:col-span-2">
-            <div className="font-brand text-2xl font-black tracking-tighter text-white">
-              T<span className="italic text-brand">ECH24</span>
-            </div>
+            <Link href="/" className="inline-flex rounded-xl bg-white p-3" aria-label="TECH 24 home">
+              <img
+                src="/brand/tech247-logo.png?v=7"
+                alt="TECH 24 — Where Technology Meets Trust"
+                width={521}
+                height={143}
+                className="block h-auto w-full max-w-[280px] object-contain"
+                decoding="async"
+              />
+            </Link>
             <p className="max-w-sm leading-relaxed">
               TECH24 (&quot;Where Technology Meets Trust&quot;) is Bangladesh&apos;s premier technology destination for authentic computer hardware, laptops, desktop components, peripherals, and high-performance custom workstations.
             </p>

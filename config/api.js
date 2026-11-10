@@ -1,9 +1,73 @@
-const DEFAULT_API_BASE_URL = "https://admin.tech247.com.bd/api";
+const DEFAULT_API_BASE_URL = "https://api.tech247.com.bd/api";
+
+let runtimeApiBase = null;
+
+function normalizeBase(value) {
+  return String(value || "").trim().replace(/\/$/, "");
+}
+
+function isLocalHostname(hostname) {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
+function readEnvApiBase() {
+  return normalizeBase(
+    process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || DEFAULT_API_BASE_URL,
+  );
+}
+
+/** Call from a client provider so browser code uses the server-resolved .env value. */
+export function setRuntimeApiBase(url) {
+  runtimeApiBase = normalizeBase(url) || null;
+}
 
 export function baseUrl() {
-  const value = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || DEFAULT_API_BASE_URL;
+  const configured = runtimeApiBase || readEnvApiBase();
 
-  return value.replace(/\/$/, "");
+  // Public site must never keep calling a localhost API baked into an old build.
+  if (typeof window !== "undefined") {
+    try {
+      const pageLocal = isLocalHostname(window.location.hostname);
+      const apiHost = new URL(configured).hostname;
+      if (!pageLocal && isLocalHostname(apiHost)) {
+        return DEFAULT_API_BASE_URL;
+      }
+    } catch {
+      return DEFAULT_API_BASE_URL;
+    }
+  }
+
+  return configured || DEFAULT_API_BASE_URL;
+}
+
+/** Laravel origin used for /storage and /images (API base without trailing /api). */
+export function mediaBaseUrl() {
+  return baseUrl().replace(/\/api$/i, "");
+}
+
+/**
+ * Resolve product/category image URLs against the configured backend.
+ * Rewrites relative paths and accidental localhost storage URLs.
+ */
+export function resolveMediaUrl(src) {
+  if (!src) return "";
+
+  const media = mediaBaseUrl();
+
+  if (src.startsWith("/")) {
+    return `${media}${src}`;
+  }
+
+  try {
+    const url = new URL(src);
+    const mediaHost = new URL(media).hostname;
+    if (isLocalHostname(url.hostname) && !isLocalHostname(mediaHost)) {
+      return `${media}${url.pathname}${url.search}`;
+    }
+    return src;
+  } catch {
+    return src;
+  }
 }
 
 export function apiUrl(path) {

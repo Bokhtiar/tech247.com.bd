@@ -1,35 +1,18 @@
 import Link from "next/link";
 
-export default function Logo({ onDark = false, compact = false }) {
-  const ink = onDark ? "text-white" : "text-ink-strong";
-  const bar = onDark ? "bg-white" : "bg-black";
-
+export default function Logo({ onDark = false, compact = false, alwaysWordmark = false }) {
   return (
-    <Link href="/" className="flex items-center gap-2 select-none shrink-0">
-      <span className={`flex items-center font-black tracking-tighter leading-none font-brand ${ink}`}>
-        <span className="text-2xl sm:text-4xl">T</span>
-        <span className="relative mx-0.5 inline-flex h-7 w-4 flex-col justify-between sm:h-8">
-          <span className={`h-1.5 w-full rounded-sm sm:h-2 ${bar}`} />
-          <span className="h-1 w-full rounded-sm bg-brand sm:h-1.5" />
-          <span className="h-1.5 w-full rounded-sm bg-brand sm:h-2" />
-        </span>
-        <span className="text-2xl sm:text-4xl">CH</span>
-        <span className="ml-0.5 text-2xl italic text-brand sm:ml-1 sm:text-4xl">2</span>
-        <span className="relative text-2xl sm:text-4xl">
-          4
-          <i className="fa-solid fa-bolt absolute -top-1 -right-1.5 text-[10px] text-brand sm:text-xs" />
-        </span>
-      </span>
-      {compact ? null : (
-        <span className="ml-3 hidden flex-col border-l-2 border-slate-300 pl-2.5 xl:flex">
-          <span className="text-[9px] font-bold uppercase leading-tight tracking-widest text-ink-muted">
-            Where Technology
-          </span>
-          <span className="text-[9px] font-black uppercase leading-tight tracking-widest text-brand">
-            Meets Trust
-          </span>
-        </span>
-      )}
+    <Link href="/" className="flex shrink-0 items-center select-none" aria-label="TECH 24 home">
+      <img
+        src="/brand/tech247-logo.png?v=6"
+        alt="TECH 24 — Where Technology Meets Trust"
+        width={compact ? 140 : 180}
+        height={compact ? 48 : 62}
+        className={`block h-auto w-auto object-contain ${
+          compact ? "max-h-10 max-w-[9rem] sm:max-h-11 sm:max-w-[10rem]" : "max-h-12 max-w-[11.5rem] sm:max-h-14 sm:max-w-[13.5rem]"
+        }`}
+        decoding="async"
+      />
     </Link>
   );
 }

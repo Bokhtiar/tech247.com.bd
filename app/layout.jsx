@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Inter, Rajdhani } from "next/font/google";
 import SiteFrame from "@/components/layout/SiteFrame";
+import { baseUrl } from "@/config/api";
 import { getBrands } from "@/service/brands";
 import { getCategories } from "@/service/categories";
 import { getProducts } from "@/service/products";
@@ -28,6 +29,7 @@ export const metadata = {
 };
 
 async function CatalogShell({ children }) {
+  const apiBaseUrl = baseUrl();
   const [categories, products, brands] = await Promise.all([
     getCategories(),
     getProducts({ per_page: 100 }),
@@ -35,7 +37,7 @@ async function CatalogShell({ children }) {
   ]);
 
   return (
-    <SiteFrame categories={categories} products={products} brands={brands}>
+    <SiteFrame apiBaseUrl={apiBaseUrl} categories={categories} products={products} brands={brands}>
       {children}
     </SiteFrame>
   );
@@ -49,7 +51,7 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{ __html: themeBoot }} />
       </head>
       <body className="flex min-h-screen flex-col bg-muted font-sans text-ink antialiased selection:bg-brand selection:text-white" suppressHydrationWarning>
-        <Suspense fallback={<SiteFrame><p className="px-4 py-16 text-center text-sm text-ink-muted">Loading catalog...</p></SiteFrame>}>
+        <Suspense fallback={<SiteFrame apiBaseUrl={baseUrl()}><p className="px-4 py-16 text-center text-sm text-ink-muted">Loading catalog...</p></SiteFrame>}>
           <CatalogShell>{children}</CatalogShell>
         </Suspense>
       </body>

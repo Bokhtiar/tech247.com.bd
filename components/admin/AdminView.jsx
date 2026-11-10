@@ -3,16 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/components/store/StoreProvider";
 import Price from "@/components/ui/Price";
-import { baseUrl } from "@/config/api";
+import { mediaBaseUrl } from "@/config/api";
 import { adminSummary } from "@/service/orders";
-
-const staffAdminUrl = baseUrl().replace(/\/api\/?$/, "/admin");
 
 export default function AdminView() {
   const store = useStore();
   const canvasRef = useRef(null);
   const [summary, setSummary] = useState(null);
   const [status, setStatus] = useState("loading");
+  const staffAdminUrl = `${mediaBaseUrl()}/admin`;
 
   useEffect(() => {
     let cancelled = false;

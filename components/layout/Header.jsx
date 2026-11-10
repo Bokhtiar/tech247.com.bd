@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { formatBDT } from "@/lib/format";
+import { mediaBaseUrl } from "@/config/api";
 import { useStore } from "@/components/store/StoreProvider";
 import Logo from "@/components/layout/Logo";
 import RemoteImage from "@/components/ui/RemoteImage";
@@ -11,6 +12,7 @@ import RemoteImage from "@/components/ui/RemoteImage";
 export default function Header() {
   const router = useRouter();
   const store = useStore();
+  const staffPortalUrl = `${mediaBaseUrl()}/admin/login`;
   const [query, setQuery] = useState(store.filters.searchQuery);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
@@ -99,7 +101,7 @@ export default function Header() {
             </button>
             <span className="text-slate-700">|</span>
             <a
-              href="http://admin.tech247.com.bd/admin/login"
+              href={staffPortalUrl}
               className="flex items-center gap-1 rounded bg-brand px-2.5 py-0.5 font-bold text-white shadow-sm transition hover:bg-brand-hover"
             >
               <i className="fa-solid fa-user-shield" /> <span>Staff Portal</span>
@@ -180,7 +182,7 @@ export default function Header() {
                 <i className="fa-solid fa-microchip animate-pulse text-yellow-300" />
                 <span className="hidden sm:inline">PC BUILDER</span>
               </Link>
-              <IconButton label="Compare products" onClick={() => store.openUi("compare")} icon="fa-solid fa-code-compare" count={store.compareList.length} />
+              <IconButton label="Compare products" onClick={() => store.openCompare()} icon="fa-solid fa-code-compare" count={store.compareList.length} />
               <IconButton label="Wishlist" onClick={() => store.openUi("wishlist")} icon="fa-regular fa-heart" count={store.wishlist.length} hot />
               <button
                 type="button"
